@@ -109,7 +109,7 @@ def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_
     plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')
     plt.grid(True)
     plt.savefig("rejections_by_time.png")
-    plt.close()
+    plt.close()44
 
 
 def plot_comparison(reference_rejections, perturbed_rejections):
@@ -130,5 +130,10 @@ def plot_comparison(reference_rejections, perturbed_rejections):
     plt.close()
 
 
+
+
+#make function to pull lat and levels from coles path
+
+#make function to extract data from pickle files for set number of days (nested for loops)
 
 ##the end
