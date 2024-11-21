@@ -54,7 +54,7 @@ def correction(p_values_combined):
 
     ## reshape corrected pvalues back into the 4d array
     corrected_pvalues_reshaped = corrected_pvalues.reshape(p_values_combined.shape)
-
+    print (corrected_pvalues_reshaped.shape)
     # our <.05 p values
     significance = corrected_pvalues < .05
 
