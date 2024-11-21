@@ -55,6 +55,7 @@ def correction(p_values_combined):
     ## reshape corrected pvalues back into the 4d array
     corrected_pvalues_reshaped = corrected_pvalues.reshape(p_values_combined.shape)
     print (corrected_pvalues_reshaped.shape)
+    
     # our <.05 p values
     significance = corrected_pvalues < .05
 
@@ -62,9 +63,14 @@ def correction(p_values_combined):
     return significance
 
 
+days_since=int(sys.argv[1])
+ensemble_name=sys.argv[2]
+variable_name=sys.argv[3]
+output_dir=sys.argv[4]
+
+significance = correction(load_pvalues())
 
 ###### plots #######
-
 # plotting the number of null hypothesis rejection across latitude, model level, and time
 
 rejection_latitude = np.sum(significance, axis=(0, 2, 3))  # Sum across time, levels, and longitude
