@@ -21,14 +21,15 @@ def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_betwee
 
     # make empty space for our pvalues
     pvalues_list = []
-    start_date = datetime(year = 2011, month=1, day=1)
+    start_date = datetime(2011,1,1)
+    end_date = datetime(2011,1,6)
 
     while current_date <= end_date:
         # Create date string
         date_str = current_date.strftime("%Y%m%d%H")
         
         # Define the pickle file path
-        pickle_file = "/fs/scratch/PAS2635/chan1063/AS4194_Final_Project/GoodAlbrecht"
+        pickle_file = "/fs/scratch/PAS2856/AS4194_Project/GoodAlbrecht"
         
         # Load the pickle file
         with open(pickle_file, 'rb') as f:
@@ -39,6 +40,7 @@ def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_betwee
         pvalues_list.append(p_values)
         
         # Increment to the next date
+        current_date = 0
         current_date += timedelta(days=1)
     
     # Convert the list of p-values into a 4D numpy array
@@ -78,54 +80,54 @@ rejection_level = np.sum(significance, axis=(0, 1, 3))  # Sum across time, latit
 rejection_time = np.sum(significance, axis=(1, 2, 3))  # Sum across levels, latitudes, and longitude
 
 
-##### lat 
-plt.figure(figsize=(10, 6))
-plt.plot(np.arange(latitudes), rejection_latitude, label='Rejections by Latitude', color='blue')
-plt.xlabel('Latitude index')
-plt.ylabel('Number of Null Hypothesis Rejections')
-plt.title(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name})')
-plt.grid(True)
-plt.savefig("rejections_by_latitude.png")
-plt.close()
+def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, variable_name):
+    plt.figure(figsize=(10, 6))
+    plt.plot(np.arange(latitudes), rejection_latitude, label='Rejections by Latitude', color='blue')
+    plt.xlabel('Latitude index')
+    plt.ylabel('Number of Null Hypothesis Rejections')
+    plt.title(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name})')
+    plt.grid(True)
+    plt.savefig("rejections_by_latitude.png")
+    plt.close()
 
-### level
-plt.figure(figsize=(10, 6))
-plt.plot(np.arange(levels), rejection_level, label='Rejections by Level', color='green')
-plt.xlabel('Model Level')
-plt.ylabel('Number of Null Hypothesis Rejections')
-plt.title(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name})')
-plt.grid(True)
-plt.savefig("rejections_by_level.png")
-plt.close()
-
-
-#### time 
-plt.figure(figsize=(10, 6))
-plt.plot(np.arange(significant_mask.shape[0]), rejection_time, label='Rejections by Time', color='red')
-plt.xlabel('Time step')
-plt.ylabel('Number of Null Hypothesis Rejections')
-plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')
-plt.grid(True)
-plt.savefig("rejections_by_time.png")
-plt.close()
+def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
+    plt.figure(figsize=(10, 6))
+    plt.plot(np.arange(levels), rejection_level, label='Rejections by Level', color='green')
+    plt.xlabel('Model Level')
+    plt.ylabel('Number of Null Hypothesis Rejections')
+    plt.title(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name})')
+    plt.grid(True)
+    plt.savefig("rejections_by_level.png")
+    plt.close()
 
 
-#### plotting comparisons
-rejection_reference = np.sum(reference_mask, axis=(0, 1, 2))  # Sum over time, levels, and latitudes
-rejection_perturbed = np.sum(perturbed_mask, axis=(0, 1, 2))  # Sum over time, levels, and latitudes
+def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name):
+    plt.figure(figsize=(10, 6))
+    plt.plot(np.arange(significant_mask.shape[0]), rejection_time, label='Rejections by Time', color='red')
+    plt.xlabel('Time step')
+    plt.ylabel('Number of Null Hypothesis Rejections')
+    plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')
+    plt.grid(True)
+    plt.savefig("rejections_by_time.png")
+    plt.close()
 
 
-    # plotting the comparison
-plt.figure(figsize=(10, 6))
-plt.plot(np.arange(len(rejection_reference)), rejection_reference, label='Reference Ensemble', color='blue')
-plt.plot(np.arange(len(rejection_perturbed)), rejection_perturbed, label='Perturbed Ensemble', color='orange')
-plt.xlabel('Time Step')
-plt.ylabel('Number of Null Hypothesis Rejections')
-plt.title('Comparison of Null Hypothesis Rejections for {name} (Reference vs. Perturbed Ensemble)')
-plt.legend()
-plt.grid(True)
-plt.savefig("comparison_rejections.png")
-plt.close()
+def plot_comparison(reference_rejections, perturbed_rejections):
+    rejection_reference = np.sum(reference_mask, axis=(0, 1, 2))  # Sum over time, levels, and latitudes
+    rejection_perturbed = np.sum(perturbed_mask, axis=(0, 1, 2))  # Sum over time, levels, and latitudes
+
+
+        # plotting the comparison
+    plt.figure(figsize=(10, 6))
+    plt.plot(np.arange(len(rejection_reference)), rejection_reference, label='Reference Ensemble', color='blue')
+    plt.plot(np.arange(len(rejection_perturbed)), rejection_perturbed, label='Perturbed Ensemble', color='orange')
+    plt.xlabel('Time Step')
+    plt.ylabel('Number of Null Hypothesis Rejections')
+    plt.title('Comparison of Null Hypothesis Rejections for {name} (Reference vs. Perturbed Ensemble)')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig("comparison_rejections.png")
+    plt.close()
 
 
 
