@@ -28,7 +28,7 @@ def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_betwee
         date_str = current_date.strftime("%Y%m%d%H")
         
         # Define the pickle file path
-        pickle_file = "{variable_name}_{ensemble_name}_{date_str}_pvalues.pkl"
+        pickle_file = "/fs/scratch/PAS2635/chan1063/AS4194_Final_Project/GoodAlbrecht"
         
         # Load the pickle file
         with open(pickle_file, 'rb') as f:
@@ -76,7 +76,7 @@ significance = correction(load_pvalues())
 rejection_latitude = np.sum(significance, axis=(0, 2, 3))  # Sum across time, levels, and longitude
 rejection_level = np.sum(significance, axis=(0, 1, 3))  # Sum across time, latitudes, and longitude
 rejection_time = np.sum(significance, axis=(1, 2, 3))  # Sum across levels, latitudes, and longitude
-    
+
 
 ##### lat 
 plt.figure(figsize=(10, 6))
