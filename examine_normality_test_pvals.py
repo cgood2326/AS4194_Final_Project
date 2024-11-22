@@ -98,7 +98,7 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, va
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    plt.plot(np.arange(len(levels)), rejection_level, label='Rejections by Level', color='green')
+    plt.plot(levels, rejection_level, label='Rejections by Level', color='green')
     plt.xlabel('Model Level')
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name})')
@@ -108,7 +108,7 @@ def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_na
 
 def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    plt.plot(np.arange(len(time_steps)), rejection_time, label='Rejections by Time', color='red')
+    plt.plot(time_steps, rejection_time, label='Rejections by Time', color='red')
     plt.xlabel('Time step')
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')
@@ -149,12 +149,13 @@ time_steps = [start_date + timedelta(days=i) for i in range(len(significance))]
 
 ## plot the results (looks very pretty with our functions)
 rejection_latitude = np.mean(significance, axis=(0, 1, 3))
+print(latitudes_combined.shape)
 plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, ensemble_name, variable_name)
 
 rejection_level = np.mean(significance, axis=(0, 2, 3)) 
 plot_rejections_by_level(np.arange(8), rejection_level, ensemble_name, variable_name)
 
-rejection_time = np.mean(significance, axis=(1, 2)) 
-plot_rejections_by_time(np.arange(len(significance)), rejection_time, ensemble_name, variable_name)
+rejection_time = np.mean(significance, axis=(1, 2, 3)) 
+plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name)
 
 
