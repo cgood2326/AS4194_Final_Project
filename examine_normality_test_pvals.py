@@ -134,11 +134,14 @@ variable_name = sys.argv[3]
 start_date = sys.argv[4]
 
 
-# Extract data
+## extract data
 p_values_combined, levels_combined, latitudes_combined = extract_lat_level_data(ensemble_name, start_date, end_date)
 
-# Perform correction
+## perform correction
 significance = correction(p_values_combined)
+
+## reverting start date bact to string to be compatible with timedelta
+start_date = datetime.strptime(start_date, "%Y%m%d%H")
 
 ## using out significance, i create the variable time steps for how many times (days) to get data
 time_steps = [start_date + timedelta(days=i) for i in range(len(significance))]
