@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 
 start_date = datetime(2011,1,1,00)
-## testing values end_date = datetime(2011,1,6)
+
 
 ##open levels from nc file to use for the levels and lats
 def open_file_for_date(ensemble_name, date_str):
@@ -91,7 +91,7 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
 
 def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    plt.plot(np.arange(len(latitudes)), rejection_latitude, label='Rejections by Latitude', color='blue')
+    plt.plot(latitudes, rejection_latitude, label='Rejections by Latitude', color='blue')
     plt.xlabel('Latitude index')
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name})')
@@ -140,6 +140,11 @@ variable_name = sys.argv[3]
 # Extract data
 p_values_combined, levels_combined, latitudes_combined = extract_lat_level_data(ensemble_name, start_date, end_date)
 
+
+print (levels_combined.shape)
+
+print(latitudes_combined.shape)
+
 # Perform correction
 significance = correction(p_values_combined)
 
@@ -148,13 +153,13 @@ time_steps = [start_date + timedelta(days=i) for i in range(len(significance))]
 
 
 ## plot the results (looks very pretty with our functions)
-rejection_latitude = np.sum(significance, axis=(1, 2))
-plot_rejections_by_latitude(latitudes_combined[0], np.sum(significance, axis=(0,2,3)), ensemble_name, variable_name)
+rejection_latitude = np.sum(significance, axis=(0, 1, 3))
+plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, ensemble_name, variable_name)
 
 rejection_level = np.sum(significance, axis=(0, 2)) 
-plot_rejections_by_level(levels_combined[0], np.sum(significance, axis=(0,1,3)), ensemble_name, variable_name)
+plot_rejections_by_level(levels_combined[0], rejection_level, ensemble_name, variable_name)
 
 rejection_time = np.sum(significance, axis=(1, 2)) 
-plot_rejections_by_time(np.arange(len(significance)), np.sum(significance, axis=(1,2,3)), ensemble_name, variable_name)
+plot_rejections_by_time(np.arange(len(significance)), rejection_time, ensemble_name, variable_name)
 
 
