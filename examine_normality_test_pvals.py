@@ -9,9 +9,6 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 
 
-start_date = datetime(2011,1,1,00)
-
-
 ##open levels from nc file to use for the levels and lats
 def open_file_for_date(ensemble_name, date_str):
     base_SPEEDY = '/fs/ess/PAS2856/SPEEDY_ensemble_data' 
@@ -39,7 +36,7 @@ def correction(p_values_combined):
     print (corrected_pvalues_reshaped.shape)
     
     # our <.05 p values
-    significance = corrected_pvalues_reshaped < .05
+    significance = corrected_pvalues_reshaped > .05
 
     print(significance.shape)
 
@@ -53,6 +50,10 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
     latitudes_list = []
     levels_list = []
     pvalues_list = []
+
+    ##making end date a datetime so it can be used in <=
+    end_date = datetime.strptime(end_date, "%Y%m%d%H")
+    start_date = datetime.strptime(start_date, "%Y%m%d%H")
     current_date = start_date
 
     ##defining these outside the while loop because the levels and lats are constants 
@@ -60,10 +61,6 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
     levels, latitudes = open_file_for_date(ensemble_name, date_str)
     levels_list.append(levels)
     latitudes_list.append(latitudes)
-        
-    ##making end date a datetime so it can be used in <=
-    end_date = datetime.strptime(end_date, "%Y%m%d%H")
-
 
     while current_date <= end_date:
         date_str = current_date.strftime("%Y%m%d%H")
@@ -133,17 +130,12 @@ def plot_comparison(reference_rejections, perturbed_rejections):
 ## use sys.argv tp get command line arguments
 ensemble_name = sys.argv[1] 
 end_date = sys.argv[2]  
-variable_name = sys.argv[3]  
-##quick fix from string to date
+variable_name = sys.argv[3]
+start_date = sys.argv[4]
 
 
 # Extract data
 p_values_combined, levels_combined, latitudes_combined = extract_lat_level_data(ensemble_name, start_date, end_date)
-
-
-print (levels_combined.shape)
-
-print(latitudes_combined.shape)
 
 # Perform correction
 significance = correction(p_values_combined)
@@ -153,13 +145,13 @@ time_steps = [start_date + timedelta(days=i) for i in range(len(significance))]
 
 
 ## plot the results (looks very pretty with our functions)
-rejection_latitude = np.sum(significance, axis=(0, 1, 3))
+rejection_latitude = np.mean(significance, axis=(0, 1, 3))
 plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, ensemble_name, variable_name)
 
-rejection_level = np.sum(significance, axis=(0, 2)) 
-plot_rejections_by_level(levels_combined[0], rejection_level, ensemble_name, variable_name)
+rejection_level = np.mean(significance, axis=(0, 2, 3)) 
+plot_rejections_by_level(np.arange(8), rejection_level, ensemble_name, variable_name)
 
-rejection_time = np.sum(significance, axis=(1, 2)) 
+rejection_time = np.mean(significance, axis=(1, 2)) 
 plot_rejections_by_time(np.arange(len(significance)), rejection_time, ensemble_name, variable_name)
 
 
