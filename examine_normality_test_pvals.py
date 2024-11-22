@@ -93,7 +93,7 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, va
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name})')
     plt.grid(True)
-    plt.savefig("rejections_by_latitude.png")
+    plt.savefig(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name}).png')
     plt.close()
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
@@ -103,7 +103,7 @@ def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_na
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name})')
     plt.grid(True)
-    plt.savefig("rejections_by_level.png")
+    plt.savefig(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name}).png')
     plt.close()
 
 def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name):
@@ -113,7 +113,7 @@ def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')
     plt.grid(True)
-    plt.savefig("rejections_by_time.png")
+    plt.savefig(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name}).png')
     plt.close()
 
 def plot_comparison(reference_rejections, perturbed_rejections):
