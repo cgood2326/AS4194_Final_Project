@@ -9,21 +9,18 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 
 
-
-## use this for the adjustment of p values
-#    scipy.stats.false_discovery_control
-
-
 ##open levels from nc file to use for the levels and lats
 def open_file_for_date(ensemble_name, date_str):
-    base_SPEEDY='/fs/ess/PAS2856/SPEEDY_ensemble_data'
+    base_SPEEDY = '/fs/ess/PAS2856/SPEEDY_ensemble_data' 
     file_path = f"{base_SPEEDY}/{ensemble_name}/{date_str}00.nc"
-
-    f = nc.Dataset(file_path, 'r')  # This will raise an error if the file does not exist
-    levels = np.array(f.variables['lev'][:])  # Extract sigma levels
+    f = nc.Dataset(file_path, 'r') 
+    
+    ## putting levels and lats into arrrays
+    levels = np.array(f.variables['lev'][:])  
+    latitudes = np.array(f.variables['lat'][:])  
+    
     f.close()
-    return levels
-
+    return levels, latitudes
 
 
 ##load the p-values from out pickle file using with method
@@ -35,37 +32,24 @@ def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_betwee
     start_date = datetime(2011,1,1)
     end_date = datetime(2011,1,6)
 
-    while current_date <= end_date:
-        # Create date string
-        date_str = current_date.strftime("%Y%m%d%H")
-        
-        # Define the pickle file path
+    while current_date <= end_date:        
         pickle_file = "/fs/scratch/PAS2856/AS4194_Project/GoodAlbrecht"
         
-        # Load the pickle file
         with open(pickle_file, 'rb') as f:
             p_results = pickle.load(f)
         
-        # Extract p-values for the current date
+        ## get p-values for the current date
         p_values = p_results['pvalues']
         pvalues_list.append(p_values)
         
-        # Increment to the next date
-        current_date = 0
+        ## ncrement to the next date
+        current_date = start_date
         current_date += timedelta(days=1)
     
     # Convert the list of p-values into a 4D numpy array
     p_values_combined = np.array(pvalues_list)
     return p_values_combined
 
-
-
-
-file_path = 't_reference_ens_2011122400_pvalues.pkl'
-with open(file_path, 'rb') as file:
-    data = pickle.load(file)
-
-print(data)
 
 def correction(p_values_combined):
 
@@ -84,12 +68,44 @@ def correction(p_values_combined):
     return significance
 
 
-days_since=int(sys.argv[1])
-ensemble_name=sys.argv[2]
-variable_name=sys.argv[3]
-output_dir=sys.argv[4]
+##attempting to pull the array of levels and lats from the pickle file
+def extract_lat_level_data(file_paths):
 
-significance = correction(load_pvalues())
+    start_date = datetime(2011,1,1)
+
+    ##initialize empty list
+    latitudes_list = []
+    levels_list = []
+    pvalues_list = []
+    current_date = start_date
+    end_date = datetime(2011,1,6)
+
+    while current_date <= end_date:
+        date_str = current_date.strftime("%Y%m%d%H")
+        
+        # Load the pickle file
+        pickle_file = f"/fs/scratch/PAS2856/AS4194_Project/GoodAlbrecht/{ensemble_name}/{date_str}.pkl"
+        with open(pickle_file, 'rb') as f:
+            p_results = pickle.load(f)
+        
+        # Extract p-values
+        p_values = p_results['pvalues']
+        pvalues_list.append(p_values)
+        
+        # Load NetCDF file for the same date
+        levels, latitudes = open_file_for_date(ensemble_name, date_str)
+        levels_list.append(levels)
+        latitudes_list.append(latitudes)
+        
+        # Increment the date
+        current_date += timedelta(days=1)
+    
+    # Combine all data into numpy arrays
+    p_values_combined = np.array(pvalues_list)
+    levels_combined = np.array(levels_list)
+    latitudes_combined = np.array(latitudes_list)
+    
+    return p_values_combined, levels_combined, latitudes_combined
 
 ###### plots #######
 # plotting the number of null hypothesis rejection across latitude, model level, and time
