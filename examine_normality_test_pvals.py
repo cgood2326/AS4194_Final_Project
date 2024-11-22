@@ -26,34 +26,6 @@ def open_file_for_date(ensemble_name, date_str):
     return levels, latitudes
 
 
-##load the p-values from out pickle file using with method
-def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_between, output_dir):
-
-
-    # make empty space for our pvalues
-    pvalues_list = []
-
-    ## set it to basivally 0
-    current_date = start_date
-
-
-    while current_date <= end_date:        
-        pickle_file = "/fs/scratch/PAS2856/AS4194_Project/GoodAlbrecht"
-        
-        with open(pickle_file, 'rb') as f:
-            p_results = pickle.load(f)
-        
-        ## get p-values for the current date
-        p_values = p_results['pvalues']
-        pvalues_list.append(p_values)
-        
-        ## ncrement to the next date
-        current_date += timedelta(days=1)
-    
-    # Convert the list of p-values into a 4D numpy array
-    p_values_combined = np.array(pvalues_list)
-    return p_values_combined
-
 ## function correction applys the specified method to our list of p values
 def correction(p_values_combined):
 
@@ -74,7 +46,7 @@ def correction(p_values_combined):
 
 
 ##attempting to pull the array of levels and lats from the pickle file
-def extract_lat_level_data(file_paths):
+def extract_lat_level_data(ensemble_name, start_date, end_date):
 
     ##initialize empty list
     latitudes_list = []
@@ -153,8 +125,6 @@ def plot_comparison(reference_rejections, perturbed_rejections):
     plt.savefig("comparison_rejections.png")
     plt.close()
 
-
-
 ## use sys.argv tp get command line arguments
 ensemble_name = sys.argv[1] 
 end_date_str = sys.argv[2]  
@@ -168,14 +138,13 @@ p_values_combined, levels_combined, latitudes_combined = extract_lat_level_data(
 # Perform correction
 significance = correction(p_values_combined)
 
+## using out significance, i create the variable time steps for how many times (days) to get data
+time_steps = [start_date + timedelta(days=i) for i in range(len(significance))]
+
+
 ## plot the results (looks very pretty with our functions)
 plot_rejections_by_latitude(latitudes_combined[0], np.sum(significance, axis=(0, 2, 3)), ensemble_name, variable_name)
 plot_rejections_by_level(levels_combined[0], np.sum(significance, axis=(0, 1, 3)), ensemble_name, variable_name)
 plot_rejections_by_time(np.arange(len(significance)), np.sum(significance, axis=(1, 2, 3)), ensemble_name, variable_name)
-
-
-
-
-
 
 
