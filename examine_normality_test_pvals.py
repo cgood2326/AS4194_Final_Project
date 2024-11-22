@@ -9,6 +9,9 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 
 
+start_date = datetime(2011,1,1)
+## testing values end_date = datetime(2011,1,6)
+
 ##open levels from nc file to use for the levels and lats
 def open_file_for_date(ensemble_name, date_str):
     base_SPEEDY = '/fs/ess/PAS2856/SPEEDY_ensemble_data' 
@@ -29,8 +32,10 @@ def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_betwee
 
     # make empty space for our pvalues
     pvalues_list = []
-    start_date = datetime(2011,1,1)
-    end_date = datetime(2011,1,6)
+
+    ## set it to basivally 0
+    current_date = start_date
+
 
     while current_date <= end_date:        
         pickle_file = "/fs/scratch/PAS2856/AS4194_Project/GoodAlbrecht"
@@ -43,14 +48,13 @@ def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_betwee
         pvalues_list.append(p_values)
         
         ## ncrement to the next date
-        current_date = start_date
         current_date += timedelta(days=1)
     
     # Convert the list of p-values into a 4D numpy array
     p_values_combined = np.array(pvalues_list)
     return p_values_combined
 
-
+## function correction applys the specified method to our list of p values
 def correction(p_values_combined):
 
     # faltten values
@@ -59,6 +63,7 @@ def correction(p_values_combined):
 
     ## reshape corrected pvalues back into the 4d array
     corrected_pvalues_reshaped = corrected_pvalues.reshape(p_values_combined.shape)
+   ##testing
     print (corrected_pvalues_reshaped.shape)
     
     # our <.05 p values
@@ -71,14 +76,11 @@ def correction(p_values_combined):
 ##attempting to pull the array of levels and lats from the pickle file
 def extract_lat_level_data(file_paths):
 
-    start_date = datetime(2011,1,1)
-
     ##initialize empty list
     latitudes_list = []
     levels_list = []
     pvalues_list = []
     current_date = start_date
-    end_date = datetime(2011,1,6)
 
     while current_date <= end_date:
         date_str = current_date.strftime("%Y%m%d%H")
@@ -110,14 +112,9 @@ def extract_lat_level_data(file_paths):
 ###### plots #######
 # plotting the number of null hypothesis rejection across latitude, model level, and time
 
-rejection_latitude = np.sum(significance, axis=(0, 2, 3))  # Sum across time, levels, and longitude
-rejection_level = np.sum(significance, axis=(0, 1, 3))  # Sum across time, latitudes, and longitude
-rejection_time = np.sum(significance, axis=(1, 2, 3))  # Sum across levels, latitudes, and longitude
-
-
 def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    plt.plot(np.arange(latitudes), rejection_latitude, label='Rejections by Latitude', color='blue')
+    plt.plot(np.arange(len(latitudes)), rejection_latitude, label='Rejections by Latitude', color='blue')
     plt.xlabel('Latitude index')
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name})')
@@ -127,7 +124,7 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, va
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    plt.plot(np.arange(levels), rejection_level, label='Rejections by Level', color='green')
+    plt.plot(np.arange(len(levels)), rejection_level, label='Rejections by Level', color='green')
     plt.xlabel('Model Level')
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name})')
@@ -135,17 +132,15 @@ def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_na
     plt.savefig("rejections_by_level.png")
     plt.close()
 
-
 def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    plt.plot(np.arange(significant_mask.shape[0]), rejection_time, label='Rejections by Time', color='red')
+    plt.plot(np.arange(len(time_steps)), rejection_time, label='Rejections by Time', color='red')
     plt.xlabel('Time step')
     plt.ylabel('Number of Null Hypothesis Rejections')
     plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')
     plt.grid(True)
     plt.savefig("rejections_by_time.png")
     plt.close()
-
 
 def plot_comparison(reference_rejections, perturbed_rejections):
     plt.figure(figsize=(10, 6))
@@ -160,9 +155,27 @@ def plot_comparison(reference_rejections, perturbed_rejections):
 
 
 
+## use sys.argv tp get command line arguments
+ensemble_name = sys.argv[1] 
+end_date_str = sys.argv[2]  
+variable_name = sys.argv[3]  
 
-#make function to pull lat and levels from coles path
+end_date = datetime.strptime(end_date_str, "%Y-%m-%d")  
 
-#make function to extract data from pickle files for set number of days (nested for loops)
+# Extract data
+p_values_combined, levels_combined, latitudes_combined = extract_lat_level_data(ensemble_name, start_date, end_date)
 
-##the end
+# Perform correction
+significance = correction(p_values_combined)
+
+## plot the results (looks very pretty with our functions)
+plot_rejections_by_latitude(latitudes_combined[0], np.sum(significance, axis=(0, 2, 3)), ensemble_name, variable_name)
+plot_rejections_by_level(levels_combined[0], np.sum(significance, axis=(0, 1, 3)), ensemble_name, variable_name)
+plot_rejections_by_time(np.arange(len(significance)), np.sum(significance, axis=(1, 2, 3)), ensemble_name, variable_name)
+
+
+
+
+
+
+
