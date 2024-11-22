@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 
 
-start_date = datetime(2011,1,1)
+start_date = datetime(2011,1,1,00)
 ## testing values end_date = datetime(2011,1,6)
 
 ##open levels from nc file to use for the levels and lats
@@ -54,22 +54,22 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
     pvalues_list = []
     current_date = start_date
 
+    levels, latitudes = open_file_for_date(ensemble_name, date_str)
+    levels_list.append(levels)
+    latitudes_list.append(latitudes)
+        
+
     while current_date <= end_date:
         date_str = current_date.strftime("%Y%m%d%H")
         
         # Load the pickle file
-        pickle_file = f"/fs/scratch/PAS2856/AS4194_Project/GoodAlbrecht/{ensemble_name}/{date_str}.pkl"
+        pickle_file = f"{variable_name}_{ensemble_name}_{date_str}_pvalues.pkl"
         with open(pickle_file, 'rb') as f:
             p_results = pickle.load(f)
         
         # Extract p-values
         p_values = p_results['pvalues']
         pvalues_list.append(p_values)
-        
-        # Load NetCDF file for the same date
-        levels, latitudes = open_file_for_date(ensemble_name, date_str)
-        levels_list.append(levels)
-        latitudes_list.append(latitudes)
         
         # Increment the date
         current_date += timedelta(days=1)
@@ -127,10 +127,10 @@ def plot_comparison(reference_rejections, perturbed_rejections):
 
 ## use sys.argv tp get command line arguments
 ensemble_name = sys.argv[1] 
-end_date_str = sys.argv[2]  
+end_date = sys.argv[2]  
 variable_name = sys.argv[3]  
+##quick fix from string to date
 
-end_date = datetime.strptime(end_date_str, "%Y-%m-%d")  
 
 # Extract data
 p_values_combined, levels_combined, latitudes_combined = extract_lat_level_data(ensemble_name, start_date, end_date)
