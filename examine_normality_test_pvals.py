@@ -13,7 +13,18 @@ import matplotlib.pyplot as plt
 ## use this for the adjustment of p values
 #    scipy.stats.false_discovery_control
 
-##start with entering dates and making an integer to determine the distance between them
+
+##open levels from nc file to use for the levels and lats
+def open_file_for_date(ensemble_name, date_str):
+    base_SPEEDY='/fs/ess/PAS2856/SPEEDY_ensemble_data'
+    file_path = f"{base_SPEEDY}/{ensemble_name}/{date_str}00.nc"
+
+    f = nc.Dataset(file_path, 'r')  # This will raise an error if the file does not exist
+    levels = np.array(f.variables['lev'][:])  # Extract sigma levels
+    f.close()
+    return levels
+
+
 
 ##load the p-values from out pickle file using with method
 def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_between, output_dir):
@@ -47,6 +58,14 @@ def load_pvalues(start_date, end_date, ensemble_name, variable_name, days_betwee
     p_values_combined = np.array(pvalues_list)
     return p_values_combined
 
+
+
+
+file_path = 't_reference_ens_2011122400_pvalues.pkl'
+with open(file_path, 'rb') as file:
+    data = pickle.load(file)
+
+print(data)
 
 def correction(p_values_combined):
 
@@ -109,21 +128,15 @@ def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_
     plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')
     plt.grid(True)
     plt.savefig("rejections_by_time.png")
-    plt.close()44
+    plt.close()
 
 
 def plot_comparison(reference_rejections, perturbed_rejections):
-    rejection_reference = np.sum(reference_mask, axis=(0, 1, 2))  # Sum over time, levels, and latitudes
-    rejection_perturbed = np.sum(perturbed_mask, axis=(0, 1, 2))  # Sum over time, levels, and latitudes
-
-
-        # plotting the comparison
     plt.figure(figsize=(10, 6))
-    plt.plot(np.arange(len(rejection_reference)), rejection_reference, label='Reference Ensemble', color='blue')
-    plt.plot(np.arange(len(rejection_perturbed)), rejection_perturbed, label='Perturbed Ensemble', color='orange')
+    plt.plot(np.arange(len(reference_rejections)), reference_rejections, label='Reference Ensemble', color='blue')
+    plt.plot(np.arange(len(perturbed_rejections)), perturbed_rejections, label='Perturbed Ensemble', color='orange')
     plt.xlabel('Time Step')
     plt.ylabel('Number of Null Hypothesis Rejections')
-    plt.title('Comparison of Null Hypothesis Rejections for {name} (Reference vs. Perturbed Ensemble)')
     plt.legend()
     plt.grid(True)
     plt.savefig("comparison_rejections.png")
