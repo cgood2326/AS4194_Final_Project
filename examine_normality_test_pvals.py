@@ -86,10 +86,21 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
 ###### plots #######
 # plotting the number of null hypothesis rejection across latitude, model level, and time
 
+
 def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensemble_name, variable_name):
+
+    print(f"rejection_latitude shape: {rejection_latitude.shape}")
+    print(f"latitudes shape: {latitudes.shape}")
+    print(f"time_steps length: {len(time_steps)}")
     
-    # Plot the contour: time_steps vs latitudes vs rejection values
-    cnf = plt.contourf(time_steps, latitudes, rejection_latitude, cmap='inferno', extend='both')
+    # Make sure latitudes correspond to the right axis
+    # latitudes should correspond to the second dimension of rejection_latitude, which is (8)
+    if latitudes.shape[0] != rejection_latitude.shape[1]:
+        raise ValueError(f"Latitudes shape ({latitudes.shape[0]}) does not match the second dimension of rejection_latitude ({rejection_latitude.shape[1]})")
+
+    # Plot the contour
+    cnf = plt.contourf(time_steps, latitudes, rejection_latitude.T, cmap='inferno', extend='both')
+    
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')
     plt.xlabel('Time Steps')
     plt.ylabel('Latitude')
@@ -100,8 +111,6 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensem
 
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
-
-    print(f"Shape of rejection_level: {rejection_level.shape}")
 
     plt.figure(figsize=(10, 6))
     cnf = plt.contourf(np.arange(rejection_level.shape[1]), levels, rejection_level, cmap='inferno', extend='both')
@@ -114,10 +123,6 @@ def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_na
     plt.close()
 
 def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name):
-
-
-    print(f"Shape of time_steps: {len(time_steps)}")
-    print(f"Shape of rejection_time: {rejection_time.shape}")
 
     plt.figure(figsize=(10, 6))
     cnf = plt.contourf(time_steps, np.arange(rejection_time.shape[1]), rejection_time, cmap='inferno', extend='both')
@@ -136,25 +141,22 @@ variable_name = sys.argv[3]
 start_date = sys.argv[4]
 
 
-## extract data
 p_values_combined, levels_combined, latitudes_combined = extract_lat_level_data(ensemble_name, start_date, end_date)
-
-## perform correction
 significance = correction(p_values_combined)
 
-## reverting start date bact to string to be compatible with timedelta
+# Convert start_date to datetime object before creating time_steps
 start_date = datetime.strptime(start_date, "%Y%m%d%H")
 
-## using out significance, i create the variable time steps for how many times (days) to get data
+# Creating time steps (days incremented by 1)
 time_steps = [start_date + timedelta(days=i) for i in range(len(significance))]
 
-
-## plot the results (looks very pretty with our functions)
-rejection_latitude = np.mean(significance, axis=(0, 1))  ##over levels and time
+# Adjust dimensions of rejection variables
+rejection_latitude = np.mean(significance, axis=(2, 3))  ## Average over levels and grid points (axis 1 and 3)
 plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, time_steps, ensemble_name, variable_name)
 
-rejection_level = np.mean(significance, axis=(0, 2))  ## over latitudes and time
+rejection_level = np.mean(significance, axis=(2, 3))  ## Average over latitudes and grid points
 plot_rejections_by_level(np.arange(8), rejection_level, ensemble_name, variable_name)
 
-rejection_time = np.mean(significance, axis=(1, 2))  ## over latitudes and levels
+rejection_time = np.mean(significance, axis=(1, 2, 3))  ## Average over latitudes, levels, and grid points
 plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name)
+
