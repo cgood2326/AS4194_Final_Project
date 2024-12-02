@@ -86,11 +86,18 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
 ###### plots #######
 # plotting the number of null hypothesis rejection across latitude, model level, and time
 
-def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, variable_name):
-
+def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    cnf = plt.contourf(time_steps, latitudes, rejection_latitude, cmap='viridis', extend='both')
-    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections') 
+    
+    # Debug: print shapes
+    print(f"Shape of time_steps: {len(time_steps)}")
+    print(f"Shape of rejection_latitude: {rejection_latitude.shape}")
+    
+    # Rejection latitude should already have shape (48, 96), so no need to average over time or levels
+    
+    # Plot with the correct shapes: latitudes vs time steps
+    cnf = plt.contourf(time_steps, latitudes, rejection_latitude, cmap='inferno', extend='both')
+    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')
     plt.xlabel('Time Steps')
     plt.ylabel('Latitude')
     plt.title(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name})')
@@ -99,8 +106,11 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, va
     plt.close()
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
+
+    print(f"Shape of rejection_level: {rejection_level.shape}")
+
     plt.figure(figsize=(10, 6))
-    cnf = plt.contourf(time_steps, levels, rejection_level, cmap='viridis', extend='both')
+    cnf = plt.contourf(np.arange(rejection_level.shape[1]), levels, rejection_level, cmap='inferno', extend='both')
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  
     plt.xlabel('Time Steps')
     plt.ylabel('Model Levels')
@@ -110,8 +120,13 @@ def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_na
     plt.close()
 
 def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name):
+
+
+    print(f"Shape of time_steps: {len(time_steps)}")
+    print(f"Shape of rejection_time: {rejection_time.shape}")
+
     plt.figure(figsize=(10, 6))
-    cnf = plt.contourf(time_steps, np.arange(rejection_time.shape[1]), rejection_time, cmap='viridis', extend='both')
+    cnf = plt.contourf(time_steps, np.arange(rejection_time.shape[1]), rejection_time, cmap='inferno', extend='both')
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections') 
     plt.xlabel('Time Steps')
     plt.ylabel('Latitude/Model Levels')
@@ -145,7 +160,7 @@ rejection_latitude = np.mean(significance, axis=(0, 1))  ##over levels and time
 plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, time_steps, ensemble_name, variable_name)
 
 rejection_level = np.mean(significance, axis=(0, 2))  ## over latitudes and time
-plot_rejections_by_level(np.arange(8), rejection_level, time_steps, ensemble_name, variable_name)
+plot_rejections_by_level(np.arange(8), rejection_level, ensemble_name, variable_name)
 
 rejection_time = np.mean(significance, axis=(1, 2))  ## over latitudes and levels
 plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name)
