@@ -87,15 +87,8 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
 # plotting the number of null hypothesis rejection across latitude, model level, and time
 
 def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensemble_name, variable_name):
-    plt.figure(figsize=(10, 6))
     
-    # Debug: print shapes
-    print(f"Shape of time_steps: {len(time_steps)}")
-    print(f"Shape of rejection_latitude: {rejection_latitude.shape}")
-    
-    # Rejection latitude should already have shape (48, 96), so no need to average over time or levels
-    
-    # Plot with the correct shapes: latitudes vs time steps
+    # Plot the contour: time_steps vs latitudes vs rejection values
     cnf = plt.contourf(time_steps, latitudes, rejection_latitude, cmap='inferno', extend='both')
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')
     plt.xlabel('Time Steps')
@@ -104,6 +97,7 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensem
     plt.grid(True)
     plt.savefig(f'Null_Hypothesis_Rejections_by_Latitude_{variable_name}_{ensemble_name}.png')
     plt.close()
+
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
 
