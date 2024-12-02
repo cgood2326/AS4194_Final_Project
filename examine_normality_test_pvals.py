@@ -87,44 +87,37 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
 # plotting the number of null hypothesis rejection across latitude, model level, and time
 
 def plot_rejections_by_latitude(latitudes, rejection_latitude, ensemble_name, variable_name):
+
     plt.figure(figsize=(10, 6))
-    plt.plot(latitudes, rejection_latitude, label='Rejections by Latitude', color='blue')
-    plt.xlabel('Latitude index')
-    plt.ylabel('Number of Null Hypothesis Rejections')
+    cnf = plt.contourf(time_steps, latitudes, rejection_latitude, cmap='viridis', extend='both')
+    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections') 
+    plt.xlabel('Time Steps')
+    plt.ylabel('Latitude')
     plt.title(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name})')
     plt.grid(True)
-    plt.savefig(f'Null Hypothesis Rejections by Latitude for {variable_name} ({ensemble_name}).png')
+    plt.savefig(f'Null_Hypothesis_Rejections_by_Latitude_{variable_name}_{ensemble_name}.png')
     plt.close()
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    plt.plot(levels, rejection_level, label='Rejections by Level', color='green')
-    plt.xlabel('Model Level')
-    plt.ylabel('Number of Null Hypothesis Rejections')
+    cnf = plt.contourf(time_steps, levels, rejection_level, cmap='viridis', extend='both')
+    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  
+    plt.xlabel('Time Steps')
+    plt.ylabel('Model Levels')
     plt.title(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name})')
     plt.grid(True)
-    plt.savefig(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name}).png')
+    plt.savefig(f'Null_Hypothesis_Rejections_by_Level_{variable_name}_{ensemble_name}.png')
     plt.close()
 
 def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))
-    plt.plot(time_steps, rejection_time, label='Rejections by Time', color='red')
-    plt.xlabel('Time step')
-    plt.ylabel('Number of Null Hypothesis Rejections')
+    cnf = plt.contourf(time_steps, np.arange(rejection_time.shape[1]), rejection_time, cmap='viridis', extend='both')
+    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections') 
+    plt.xlabel('Time Steps')
+    plt.ylabel('Latitude/Model Levels')
     plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')
     plt.grid(True)
-    plt.savefig(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name}).png')
-    plt.close()
-
-def plot_comparison(reference_rejections, perturbed_rejections):
-    plt.figure(figsize=(10, 6))
-    plt.plot(np.arange(len(reference_rejections)), reference_rejections, label='Reference Ensemble', color='blue')
-    plt.plot(np.arange(len(perturbed_rejections)), perturbed_rejections, label='Perturbed Ensemble', color='orange')
-    plt.xlabel('Time Step')
-    plt.ylabel('Number of Null Hypothesis Rejections')
-    plt.legend()
-    plt.grid(True)
-    plt.savefig("comparison_rejections.png")
+    plt.savefig(f'Null_Hypothesis_Rejections_by_Time_{variable_name}_{ensemble_name}.png')
     plt.close()
 
 ## use sys.argv tp get command line arguments
@@ -148,14 +141,11 @@ time_steps = [start_date + timedelta(days=i) for i in range(len(significance))]
 
 
 ## plot the results (looks very pretty with our functions)
-rejection_latitude = np.mean(significance, axis=(0, 1, 3))
-print(latitudes_combined.shape)
-plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, ensemble_name, variable_name)
+rejection_latitude = np.mean(significance, axis=(0, 1))  ##over levels and time
+plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, time_steps, ensemble_name, variable_name)
 
-rejection_level = np.mean(significance, axis=(0, 2, 3)) 
-plot_rejections_by_level(np.arange(8), rejection_level, ensemble_name, variable_name)
+rejection_level = np.mean(significance, axis=(0, 2))  ## over latitudes and time
+plot_rejections_by_level(np.arange(8), rejection_level, time_steps, ensemble_name, variable_name)
 
-rejection_time = np.mean(significance, axis=(1, 2, 3)) 
+rejection_time = np.mean(significance, axis=(1, 2))  ## over latitudes and levels
 plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name)
-
-
