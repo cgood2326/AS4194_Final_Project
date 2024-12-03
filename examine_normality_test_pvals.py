@@ -105,7 +105,7 @@ def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_na
     print(rejection_level.shape)
 
     plt.figure(figsize=(10, 6))
-    cnf = plt.contourf(np.arange(rejection_level.shape[1]), levels, rejection_level.T, cmap='inferno', extend='both')
+    cnf = plt.contourf(np.arange(rejection_level.shape[0]), levels, rejection_level.T, cmap='inferno', extend='both')
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  
     plt.xlabel('Time Steps')
     plt.ylabel('Model Levels')
