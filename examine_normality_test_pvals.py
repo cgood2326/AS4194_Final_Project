@@ -89,8 +89,9 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
 
 def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensemble_name, variable_name):
     
+   
     # Plot the contour: time_steps vs latitudes vs rejection values
-    cnf = plt.contourf(time_steps, latitudes, rejection_latitude, cmap='inferno', extend='both')
+    cnf = plt.contourf(time_steps, latitudes, rejection_latitude.T, cmap='inferno', extend='both')
     plt.colorbar(cnf)
     plt.title(f"Rejection by Latitude: {ensemble_name} - {variable_name}")
     plt.xlabel("Time Steps")
@@ -100,8 +101,11 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensem
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
 
+    print(levels.shape)
+    print(rejection_level.shape)
+
     plt.figure(figsize=(10, 6))
-    cnf = plt.contourf(np.arange(rejection_level.shape[1]), levels, rejection_level, cmap='inferno', extend='both')
+    cnf = plt.contourf(np.arange(rejection_level.shape[1]), levels, rejection_level.T, cmap='inferno', extend='both')
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  
     plt.xlabel('Time Steps')
     plt.ylabel('Model Levels')
@@ -138,8 +142,9 @@ start_date = datetime.strptime(start_date, "%Y%m%d%H")
 
 # Creating time steps (days incremented by 1)
 time_steps = [start_date + timedelta(days=i) for i in range(len(significance))]
+time_steps = np.array(time_steps)
 
-rejection_latitude = np.mean(significance, axis=(2, 3))  # Average over levels and grid points (axis 2 and 3)
+rejection_latitude = np.mean(significance, axis=(1, 3))  # Average over levels and grid points (axis 2 and 3)
 plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, time_steps, ensemble_name, variable_name)
 
 rejection_level = np.mean(significance, axis=(2, 3))  ## Average over latitudes and grid points
