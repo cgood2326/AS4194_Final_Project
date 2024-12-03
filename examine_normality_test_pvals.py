@@ -101,9 +101,6 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensem
 
 def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_name):
 
-    print(levels.shape)
-    print(rejection_level.shape)
-
     plt.figure(figsize=(10, 6))
     cnf = plt.contourf(np.arange(rejection_level.shape[0]), levels, rejection_level.T, cmap='inferno', extend='both')
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  
@@ -117,8 +114,11 @@ def plot_rejections_by_level(levels, rejection_level, ensemble_name, variable_na
 
 def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name):
 
+    print(rejection_time.shape)
+    print(time_steps.shape)
+
     plt.figure(figsize=(10, 6))
-    cnf = plt.contourf(time_steps, np.arange(rejection_time.shape[1]), rejection_time, cmap='inferno', extend='both')
+    cnf = plt.contourf(time_steps, np.arange(rejection_time.shape[1]), rejection_time.T, cmap='inferno', extend='both')
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections') 
     plt.xlabel('Time Steps')
     plt.ylabel('Latitude/Model Levels')
@@ -150,6 +150,6 @@ plot_rejections_by_latitude(latitudes_combined[0], rejection_latitude, time_step
 rejection_level = np.mean(significance, axis=(2, 3))  ## Average over latitudes and grid points
 plot_rejections_by_level(np.arange(8), rejection_level, ensemble_name, variable_name)
 
-rejection_time = np.mean(significance, axis=(1, 2, 3))  ## Average over latitudes, levels, and grid points
+rejection_time = np.mean(significance, axis=(1, 2))  ## Average over latitudes, levels, and grid points
 plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_name)
 
