@@ -94,10 +94,10 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
 def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensemble_name, variable_name):
     # create contour plot: time_steps vs latitudes vs rejection values
     cnf = plt.contourf(time_steps, latitudes, rejection_latitude.T, cmap='inferno', extend='both')
-    plt.colorbar(cnf)  # add color bar
-    plt.title(f"rejection by latitude: {ensemble_name} - {variable_name}")  # title
-    plt.xlabel("time steps")  # x-axis label
-    plt.ylabel("latitudes")  # y-axis label
+    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  # add color bar
+    plt.title(f"Rejection by Latitude: {ensemble_name} - {variable_name}")  # title
+    plt.xlabel("Time Steps")  # x-axis label
+    plt.ylabel("Latitudes")  # y-axis label
     plt.savefig(f'null_hypothesis_rejections_by_latitiude_{variable_name}_{ensemble_name}.png')  # save the plot
     plt.show()  # display the plot
 
@@ -105,11 +105,11 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensem
 def plot_rejections_by_level(pressure, rejection_level, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))  # set figure size
     cnf = plt.contourf(np.arange(rejection_level.shape[0]), pressure, rejection_level.T, cmap='inferno', extend='both')
-    plt.colorbar(cnf, label='number of null hypothesis rejections')  # add color bar with label
+    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  # add color bar with label
     plt.ylim((950,20))  # set y-axis limits for pressure (from 950 to 20 hPa)
-    plt.xlabel('time steps')  # x-axis label
-    plt.ylabel('theoretical pressure (hpa)')  # y-axis label
-    plt.title(f'null hypothesis rejections by model level for {variable_name} ({ensemble_name})')  # title
+    plt.xlabel('Time Steps')  # x-axis label
+    plt.ylabel('Theoretical Pressure (HPa)')  # y-axis label
+    plt.title(f'Null Hypothesis Rejections by Model Level for {variable_name} ({ensemble_name})')  # title
     plt.grid(True)  # add grid lines
     plt.savefig(f'null_hypothesis_rejections_by_level_{variable_name}_{ensemble_name}.png')  # save the plot
     plt.close()  # close the plot
@@ -121,10 +121,10 @@ def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_
 
     plt.figure(figsize=(10, 6))  # set figure size
     cnf = plt.contourf(time_steps, np.arange(rejection_time.shape[1]), rejection_time.T, cmap='inferno', extend='both')
-    plt.colorbar(cnf, label='number of null hypothesis rejections')  # add color bar with label
-    plt.xlabel('time steps')  # x-axis label
-    plt.ylabel('latitude/model levels')  # y-axis label
-    plt.title(f'null hypothesis rejections by time for {variable_name} ({ensemble_name})')  # title
+    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  # add color bar with label
+    plt.xlabel('Time Steps')  # x-axis label
+    plt.ylabel('Latitude/Model Levels')  # y-axis label
+    plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')  # title
     plt.grid(True)  # add grid lines
     plt.savefig(f'null_hypothesis_rejections_by_time_{variable_name}_{ensemble_name}.png')  # save the plot
     plt.close()  # close the plot
