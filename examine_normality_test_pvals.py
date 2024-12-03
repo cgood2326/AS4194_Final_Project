@@ -38,8 +38,6 @@ def correction(p_values_combined):
     # our <.05 p values
     significance = corrected_pvalues_reshaped > .05
 
-    print(significance.shape)
-
     return significance
 
 
@@ -96,6 +94,7 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensem
     plt.title(f"Rejection by Latitude: {ensemble_name} - {variable_name}")
     plt.xlabel("Time Steps")
     plt.ylabel("Latitudes")
+    plt.savefig(f'Null_Hypothesis_Rejections_by_latitiude_{variable_name}_{ensemble_name}.png')
     plt.show()
 
 
