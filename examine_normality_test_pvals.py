@@ -93,6 +93,7 @@ def extract_lat_level_data(ensemble_name, start_date, end_date):
 # plot the number of null hypothesis rejections across latitudes and time steps
 def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensemble_name, variable_name):
     # create contour plot: time_steps vs latitudes vs rejection values
+    plt.figure(figsize=(10, 6))  # set figure size
     cnf = plt.contourf(time_steps, latitudes, rejection_latitude.T, cmap='inferno', extend='both')
     plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  # add color bar
     plt.title(f"Rejection by Latitude: {ensemble_name} - {variable_name}")  # title
