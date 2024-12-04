@@ -95,7 +95,7 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensem
     # create contour plot: time_steps vs latitudes vs rejection values
     plt.figure(figsize=(10, 6))  # set figure size
     cnf = plt.contourf(time_steps, latitudes, rejection_latitude.T, cmap='inferno', extend='both')
-    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  # add color bar
+    plt.colorbar(cnf, label='Percentage of Null Hypothesis Rejections')  # add color bar
     plt.title(f"Rejection by Latitude: {ensemble_name} - {variable_name}")  # title
     plt.xlabel("Time Steps (Days)")  # x-axis label
     plt.ylabel("Latitudes (Degrees)")  # y-axis label
@@ -106,7 +106,7 @@ def plot_rejections_by_latitude(latitudes, rejection_latitude, time_steps, ensem
 def plot_rejections_by_level(pressure, rejection_level, ensemble_name, variable_name):
     plt.figure(figsize=(10, 6))  # set figure size
     cnf = plt.contourf(np.arange(rejection_level.shape[0]), pressure, rejection_level.T, cmap='inferno', extend='both')
-    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  # add color bar with label
+    plt.colorbar(cnf, label='Percentage of Null Hypothesis Rejections')  # add color bar with label
     plt.ylim((950,20))  # set y-axis limits for pressure (from 950 to 20 hPa)
     plt.xlabel('Time Steps (Days)')  # x-axis label
     plt.ylabel('Theoretical Pressure (HPa)')  # y-axis label
@@ -121,10 +121,10 @@ def plot_rejections_by_time(time_steps, rejection_time, ensemble_name, variable_
     print(time_steps.shape)  # print shape for debugging
 
     plt.figure(figsize=(10, 6))  # set figure size
-    cnf = plt.contourf(time_steps, np.arange(rejection_time.shape[1]), rejection_time.T, cmap='inferno', extend='both')
-    plt.colorbar(cnf, label='Number of Null Hypothesis Rejections')  # add color bar with label
-    plt.xlabel('Time Steps (Days)')  # x-axis label
-    plt.ylabel('Latitude/Model Levels')  # y-axis label
+    cnf = plt.contourf(np.arange(rejection_time.shape[1]), time_steps, rejection_time.T, cmap='inferno', extend='both')
+    plt.colorbar(cnf, label='Percentage of Null Hypothesis Rejections')  # add color bar with label
+    plt.ylabel('Time Steps (Days)')  # x-axis label
+    plt.xlabel('Average of Latitude and Model Levels')  # y-axis label
     plt.title(f'Null Hypothesis Rejections by Time for {variable_name} ({ensemble_name})')  # title
     plt.grid(True)  # add grid lines
     plt.savefig(f'null_hypothesis_rejections_by_time_{variable_name}_{ensemble_name}.png')  # save the plot
