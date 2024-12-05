@@ -1,4 +1,10 @@
+# Group Studies: Practical Programming and Data Analysis for Atmospheric Science: Final Project
 
+## "When and where are ensemble statistics non-normal? An investigation with a 1000-member SPEEDY ensemble."
+
+Welcome to the repository for the AU 24 ATMOSSC 4194 final project. Within this repository, there are two Python files that contain the code used to complete this project as well as two markdown files. The first markdown file contains the answers to questions posed in task #2. The second markdown file contains links to the Chat GPT transcripts. This repository has two contributors, Cole Good and Max Max Abrecht. 
+
+## Task 2: Where & Where are Statistics Significantly Non-Normal?
 __-----Question 1-----__
 
 _For each model variable in the perturbed ensemble, how does the number of null hypothesis rejections (i.e., non-Gaussian data) vary with latitude, model level and time?_
